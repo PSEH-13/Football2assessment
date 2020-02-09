@@ -16,6 +16,8 @@ import com.assessment.football.vo.League;
 import com.assessment.football.vo.LeagueRequestVO;
 import com.assessment.football.vo.Standing;
 import com.assessment.football.vo.Team;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
 
 @Service
 public class LeagueServiceImpl implements LeagueService {
@@ -51,6 +53,8 @@ public class LeagueServiceImpl implements LeagueService {
 		Standing[] s = getStandings(lg.getLeague_id());
 		Standing st = Arrays.stream(s).filter(item->item.getTeam_name().equals(leagueRequest.getTeamName())).findFirst().orElse(null);
 		return buildResponse(cn,lg,tm,st);
+		}catch ( VaildationException e) {
+			throw e;
 		}catch ( Exception e) {
 			throw new VaildationException("FE-401", "Something went wrong");
 		}
@@ -69,6 +73,9 @@ public class LeagueServiceImpl implements LeagueService {
 		
 	}
 	
+	@HystrixCommand(fallbackMethod="commonFallback", commandProperties= {
+			@HystrixProperty(name="execution.isolation.thread.timeoutInMilliseconds", value="1000")
+	})
 	private Country[] getCountries() {
 	     final String uri = footballApiBaseUrl+"get_countries&APIkey="+apiKey;
 	  
@@ -76,6 +83,9 @@ public class LeagueServiceImpl implements LeagueService {
 	     return c;  
 	 }
 	
+	@HystrixCommand(fallbackMethod="commonFallback", commandProperties= {
+			@HystrixProperty(name="execution.isolation.thread.timeoutInMilliseconds", value="1000")
+	})
 	private League[] getLeagues(String countryId) {
 	     final String uri = footballApiBaseUrl+"get_leagues&APIkey="+apiKey+"&country_id="+countryId;
 	  
@@ -83,6 +93,9 @@ public class LeagueServiceImpl implements LeagueService {
 	     return l;  
 	 }
 
+	@HystrixCommand(fallbackMethod="commonFallback", commandProperties= {
+			@HystrixProperty(name="execution.isolation.thread.timeoutInMilliseconds", value="1000")
+	})
 	private Team[] getTeams(String leagueId) {
 	     final String uri = footballApiBaseUrl+"get_teams&APIkey="+apiKey+"&league_id="+leagueId;
 	  
@@ -90,12 +103,20 @@ public class LeagueServiceImpl implements LeagueService {
 	     return l;  
 	 }
 	
+	@HystrixCommand(fallbackMethod="commonFallback", commandProperties= {
+			@HystrixProperty(name="execution.isolation.thread.timeoutInMilliseconds", value="1000")
+	})
 	private Standing[] getStandings(String leagueId) {
 		final String uri = footballApiBaseUrl+"get_standings&APIkey="+apiKey+"&league_id="+leagueId;
 
 		Standing[] l = restTemplate.getForObject(uri,Standing[].class);
 		return l;
 	}
+	
+	private void commonFallback() throws VaildationException {
+		throw new VaildationException("FE-1003", "could not get the response, please try again after sometime");
+	}
+	
 	
 	private Map<String,String> buildResponse(Country c, League l, Team t, Standing s){
 		Map<String,String> m = new HashMap<String,String>();
