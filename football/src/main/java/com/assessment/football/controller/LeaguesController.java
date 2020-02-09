@@ -27,7 +27,6 @@ public class LeaguesController {
       return leagueService.getStatus(leagueRequest);
     }
     
-//PSEH-13/pseh@1234
 //http://localhost:8081/api/v1/league/status?countryName=England&leagueName=Championship&teamName=Swansea
     
     @ExceptionHandler({VaildationException.class })
