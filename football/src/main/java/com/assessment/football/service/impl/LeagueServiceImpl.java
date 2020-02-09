@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import com.assessment.football.exception.VaildationException;
+import com.assessment.football.exception.CustomException;
 import com.assessment.football.service.LeagueService;
 import com.assessment.football.vo.Country;
 import com.assessment.football.vo.League;
@@ -32,43 +32,43 @@ public class LeagueServiceImpl implements LeagueService {
 	private RestTemplate restTemplate;
 	
 	@Override
-	public Map<String,String> getStatus(LeagueRequestVO leagueRequest) throws VaildationException{
+	public Map<String,String> getStatus(LeagueRequestVO leagueRequest) throws CustomException{
 		validateLeagueRequest(leagueRequest);
 		try {
 		Country[] c= getCountries();
 		Country cn = Arrays.stream(c).filter(item->item.getCountry_name().equals(leagueRequest.getCountryName())).findFirst().orElse(null);
 		if(cn == null) {
-			throw new VaildationException("FE-400","Country Name is not valid");
+			throw new CustomException("FE-400","Country Name is not valid");
 		}
 		League[] l = getLeagues(cn.getCountry_id());
 		League lg = Arrays.stream(l).filter(item->item.getLeague_name().equals(leagueRequest.getLeagueName())).findFirst().orElse(null);
 		if(lg == null) {
-			throw new VaildationException("FE-400","League Name is not valid");
+			throw new CustomException("FE-400","League Name is not valid");
 		}
 		Team[] t = getTeams(lg.getLeague_id());
 		Team tm = Arrays.stream(t).filter(item->item.getTeam_name().equals(leagueRequest.getTeamName())).findFirst().orElse(null);
 		if(tm == null) {
-			throw new VaildationException("FE-400","Team Name is not valid");
+			throw new CustomException("FE-400","Team Name is not valid");
 		}
 		Standing[] s = getStandings(lg.getLeague_id());
 		Standing st = Arrays.stream(s).filter(item->item.getTeam_name().equals(leagueRequest.getTeamName())).findFirst().orElse(null);
 		return buildResponse(cn,lg,tm,st);
-		}catch ( VaildationException e) {
+		}catch ( CustomException e) {
 			throw e;
 		}catch ( Exception e) {
-			throw new VaildationException("FE-401", "Something went wrong");
+			throw new CustomException("FE-401", "Something went wrong");
 		}
 	}
 	
-	private void validateLeagueRequest(LeagueRequestVO leagueRequest) throws VaildationException{
+	private void validateLeagueRequest(LeagueRequestVO leagueRequest) throws CustomException{
 		if(leagueRequest.getCountryName() == null || "".equals(leagueRequest.getCountryName())){
-			throw new VaildationException("FE-400","Country Name is not valid");
+			throw new CustomException("FE-400","Country Name is not valid");
 		}
 		if(leagueRequest.getLeagueName() == null || "".equals(leagueRequest.getLeagueName())){
-			throw new VaildationException("FE-400","League Name is not valid");
+			throw new CustomException("FE-400","League Name is not valid");
 		}
 		if(leagueRequest.getTeamName() == null || "".equals(leagueRequest.getTeamName())){
-			throw new VaildationException("FE-400","Team Name is not valid");
+			throw new CustomException("FE-400","Team Name is not valid");
 		}
 		
 	}
@@ -113,8 +113,8 @@ public class LeagueServiceImpl implements LeagueService {
 		return l;
 	}
 	
-	private void commonFallback() throws VaildationException {
-		throw new VaildationException("FE-1003", "could not get the response, please try again after sometime");
+	private void commonFallback() throws CustomException {
+		throw new CustomException("FE-1003", "could not get the response, please try again after sometime");
 	}
 	
 	
