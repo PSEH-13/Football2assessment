@@ -22,6 +22,9 @@ public class LeagueServiceImpl implements LeagueService {
 	@Value("${football.api.key}")
 	private String apiKey;
 	
+	@Value("${football.api.base.url}")
+	private String footballApiBaseUrl;
+	
 	private RestTemplate restTemplate = new RestTemplate();
 	
 	@Override
@@ -65,28 +68,28 @@ public class LeagueServiceImpl implements LeagueService {
 	}
 	
 	private Country[] getCountries() {
-	     final String uri = "https://apiv2.apifootball.com/?action=get_countries&APIkey="+apiKey;
+	     final String uri = footballApiBaseUrl+"get_countries&APIkey="+apiKey;
 	  
 	     Country[] c = restTemplate.getForObject(uri,Country[].class);
 	     return c;  
 	 }
 	
 	private League[] getLeagues(String countryId) {
-	     final String uri = "https://apiv2.apifootball.com/?action=get_leagues&APIkey="+apiKey+"&country_id="+countryId;
+	     final String uri = footballApiBaseUrl+"get_leagues&APIkey="+apiKey+"&country_id="+countryId;
 	  
 	     League[] l = restTemplate.getForObject(uri,League[].class);
 	     return l;  
 	 }
 
 	private Team[] getTeams(String leagueId) {
-	     final String uri = "https://apiv2.apifootball.com/?action=get_teams&APIkey="+apiKey+"&league_id="+leagueId;
+	     final String uri = footballApiBaseUrl+"get_teams&APIkey="+apiKey+"&league_id="+leagueId;
 	  
 	     Team[] l = restTemplate.getForObject(uri,Team[].class);
 	     return l;  
 	 }
 	
 	private Standing[] getStandings(String leagueId) {
-		final String uri = "https://apiv2.apifootball.com/?action=get_standings&APIkey="+apiKey+"&league_id="+leagueId;
+		final String uri = footballApiBaseUrl+"get_standings&APIkey="+apiKey+"&league_id="+leagueId;
 
 		Standing[] l = restTemplate.getForObject(uri,Standing[].class);
 		return l;
