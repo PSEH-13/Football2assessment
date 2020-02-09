@@ -1,12 +1,12 @@
 package com.assessment.football.exception;
 
-public class VaildationException extends Exception{
+public class CustomException extends Exception{
 
 	private static final long serialVersionUID = 1L;
 	private String statusCode;
 	private String statusMsg;
 	
-	public VaildationException(String statusCode, String statusMsg) {
+	public CustomException(String statusCode, String statusMsg) {
 		super();
 		this.statusCode = statusCode;
 		this.statusMsg = statusMsg;
