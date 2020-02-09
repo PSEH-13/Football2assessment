@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.assessment.football.exception.VaildationException;
+import com.assessment.football.exception.CustomException;
 import com.assessment.football.service.LeagueService;
 import com.assessment.football.vo.LeagueRequestVO;
 
@@ -22,15 +22,13 @@ public class LeaguesController {
 	LeagueService leagueService;
 	
     @GetMapping("/status")
-    public Map<String,String> status(LeagueRequestVO leagueRequest) throws VaildationException {
+    public Map<String,String> status(LeagueRequestVO leagueRequest) throws CustomException {
     	
       return leagueService.getStatus(leagueRequest);
     }
     
-//http://localhost:8081/api/v1/league/status?countryName=England&leagueName=Championship&teamName=Swansea
-    
-    @ExceptionHandler({VaildationException.class })
-    public Map<String,String> handleException(VaildationException e) {
+    @ExceptionHandler({CustomException.class })
+    public Map<String,String> handleException(CustomException e) {
         Map<String,String> h = new HashMap<>();
         h.put("statusCode", e.getStatusCode());
         h.put("statusMessage", e.getStatusMsg());
